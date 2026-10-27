@@ -222,10 +222,20 @@ copyBtn.addEventListener('click', async () => {
   setTimeout(() => { copyBtn.textContent = 'Copiază mesajul'; }, 1800);
 });
 
-/* ---------- Phone call bar once the hero is gone ---------- */
+/* ---------- Phone call bar between the hero and the contact rows ---------- */
 const bar = $('.callbar');
 if (bar && 'IntersectionObserver' in window) {
   bar.hidden = false;
-  new IntersectionObserver(([e]) => bar.classList.toggle('show', !e.isIntersecting)).observe(hero);
+  const inView = new Map();
+  const zones = [hero, $('#contact'), $('.closing')];
+  new IntersectionObserver((entries) => {
+    entries.forEach((e) => inView.set(e.target, e.isIntersecting));
+    bar.classList.toggle('show', !zones.some((z) => inView.get(z)));
+  }).observe(hero);
+  const io2 = new IntersectionObserver((entries) => {
+    entries.forEach((e) => inView.set(e.target, e.isIntersecting));
+    bar.classList.toggle('show', !zones.some((z) => inView.get(z)));
+  });
+  zones.slice(1).forEach((z) => io2.observe(z));
 }
 })();
